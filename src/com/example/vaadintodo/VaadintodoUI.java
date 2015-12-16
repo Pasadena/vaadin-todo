@@ -4,11 +4,14 @@ import javax.servlet.annotation.WebServlet;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
@@ -27,13 +30,36 @@ public class VaadintodoUI extends UI {
 		layout.setMargin(true);
 		setContent(layout);
 
-		Button button = new Button("Click Me");
+		
+		layout.addComponent(getHeader());
+		layout.addComponent(getMainContent());
+		layout.addComponent(getFooter());
+	}
+	
+	private HorizontalLayout getHeader() {
+		final HorizontalLayout header = new HorizontalLayout();
+		header.addComponent(new Label("TODOS: Get your stuff together"));
+		return header;
+	}
+	
+	protected VerticalLayout getMainContent() {
+		final VerticalLayout content = new VerticalLayout();
+		Button button = new Button("Create new item");
 		button.addClickListener(new Button.ClickListener() {
 			public void buttonClick(ClickEvent event) {
-				layout.addComponent(new Label("Thank you for clicking"));
+				content.addComponent(new Label("This one will open Create Todo -modal"));
 			}
 		});
-		layout.addComponent(button);
+		content.addComponent(button);
+		return content;
+	}
+	
+	private HorizontalLayout getFooter() {
+		final HorizontalLayout footer = new HorizontalLayout();
+		final Link viewSourcesLink = new Link("View sources in Github", new ExternalResource("https://github.com/Pasadena/vaadin-todo"));
+		viewSourcesLink.setTargetName("_blank");
+		footer.addComponent(viewSourcesLink);
+		return footer;
 	}
 
 }
