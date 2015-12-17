@@ -12,16 +12,11 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.DateField;
-import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 
 @SuppressWarnings("serial")
 @Theme("vaadintodo")
@@ -87,42 +82,4 @@ public class VaadintodoUI extends UI {
 		footer.setComponentAlignment(viewSourcesLink, Alignment.MIDDLE_CENTER);
 		return footer;
 	}
-	
-	/**private static class CreateTodoModal extends Window {
-
-		public CreateTodoModal() {
-			super("Create a new Todo");
-			this.setWindowProperties();
-			setContent(createForm());
-		}
-		
-		private void setWindowProperties() {
-			center();
-			setModal(true);
-			setClosable(false);
-			setHeight("50%");
-			setWidth("50%");
-		}
-		
-		private FormLayout createForm() {
-			final FormLayout formLayout = new FormLayout();
-			formLayout.setMargin(true);
-			
-			formLayout.addComponent(new TextField("Name:"));
-			formLayout.addComponent(new TextArea("Summary:"));
-			formLayout.addComponent(new DateField("Due date:"));
-			
-			final HorizontalLayout buttonRow = new HorizontalLayout();
-			formLayout.addComponent(buttonRow);
-			
-			final Button saveButton = new Button("Save", event -> close());
-			final Button closeButton = new Button("Close", event -> close());
-			buttonRow.addComponent(saveButton);
-			buttonRow.addComponent(closeButton);
-			
-			return formLayout;
-		}
-		
-	}**/
-
 }

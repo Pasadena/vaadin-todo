@@ -33,7 +33,9 @@ public class TodoModal extends Window {
 		final FormLayout formLayout = new FormLayout();
 		formLayout.setMargin(true);
 		
-		formLayout.addComponent(new TextField("Name:"));
+		final TextField nameButton = new TextField("Name:");
+		nameButton.setRequired(true);
+		formLayout.addComponent(nameButton);
 		formLayout.addComponent(new TextArea("Summary:"));
 		formLayout.addComponent(new DateField("Due date:"));
 		
