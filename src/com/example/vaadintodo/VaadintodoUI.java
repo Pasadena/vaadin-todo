@@ -1,8 +1,12 @@
 package com.example.vaadintodo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.annotation.WebServlet;
 
 import com.example.vaadintodo.components.TodoModal;
+import com.example.vaadintodo.models.Todo;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.ExternalResource;
@@ -11,12 +15,14 @@ import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Window.CloseEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 @SuppressWarnings("serial")
 @Theme("vaadintodo")
@@ -26,6 +32,8 @@ public class VaadintodoUI extends UI {
 	@VaadinServletConfiguration(productionMode = false, ui = VaadintodoUI.class)
 	public static class Servlet extends VaadinServlet {
 	}
+	
+	private final List<Todo> todos = new ArrayList<Todo>();
 
 	@Override
 	protected void init(VaadinRequest request) {
@@ -33,7 +41,6 @@ public class VaadintodoUI extends UI {
 		layout.setMargin(true);
 		layout.setSizeFull();
 		setContent(layout);
-
 		
 		final Component header = getHeader();
 		layout.addComponent(header);
@@ -64,9 +71,18 @@ public class VaadintodoUI extends UI {
 		final VerticalLayout content = new VerticalLayout();
 		Button button = new Button("Create new item");
 		button.addClickListener(new Button.ClickListener() {
+			
 			public void buttonClick(ClickEvent event) {
-				final TodoModal createTodoModal = new TodoModal("Create a new Todo");
+				final TodoModal createTodoModal = new TodoModal("Create a new Todo", new Todo());
 				UI.getCurrent().addWindow(createTodoModal);
+				createTodoModal.addCloseListener(new Window.CloseListener() {
+					
+					@Override
+					public void windowClose(CloseEvent event) {
+						todos.add(((TodoModal)event.getComponent()).getModifiedTodo());
+						System.out.println(todos.size());
+					}
+				});
 			}
 		});
 		content.addComponent(button);
