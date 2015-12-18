@@ -53,6 +53,7 @@ public class TodoModal extends Window {
 		formLayout.addComponent(summaryField);
 		
 		final DateField dueDateField = new DateField("Due date:"); 
+		dueDateField.setDateFormat("dd.MM.yyyy");
 		formLayout.addComponent(dueDateField);
 		
 		final HorizontalLayout buttonRow = new HorizontalLayout();
@@ -76,9 +77,11 @@ public class TodoModal extends Window {
 			close();
 		} catch (FieldGroup.CommitException ce) {
 			Notification.show("Unexpected error happened during save", Notification.Type.ERROR_MESSAGE);
+			System.out.println(ce.getCause().getMessage());
 		}
 	}
 	
+	@SuppressWarnings(value = "unchecked")
 	public Todo getModifiedTodo() {
 		return ((BeanItem<Todo>)todoFieldGroup.getItemDataSource()).getBean();
 	}

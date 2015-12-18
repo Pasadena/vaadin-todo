@@ -1,7 +1,7 @@
 package com.example.vaadintodo.models;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.util.Date;
 
 public class Todo implements Serializable {
 	
@@ -9,7 +9,7 @@ public class Todo implements Serializable {
 	
 	private String summary;
 	
-	private LocalDate dueDate;
+	private Date dueDate;
 
 	public String getName() {
 		return name;
@@ -27,11 +27,11 @@ public class Todo implements Serializable {
 		this.summary = summary;
 	}
 
-	public LocalDate getDueDate() {
+	public Date getDueDate() {
 		return dueDate;
 	}
 
-	public void setDueDate(LocalDate dueDate) {
+	public void setDueDate(Date dueDate) {
 		this.dueDate = dueDate;
 	}
 	
