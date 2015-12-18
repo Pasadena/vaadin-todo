@@ -1,5 +1,7 @@
 package com.example.vaadintodo;
 
+import java.util.Optional;
+
 import javax.servlet.annotation.WebServlet;
 
 import com.example.vaadintodo.components.TodoModal;
@@ -7,6 +9,9 @@ import com.example.vaadintodo.models.Todo;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.BeanItem;
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -32,7 +37,7 @@ public class VaadintodoUI extends UI {
 	public static class Servlet extends VaadinServlet {
 	}
 	
-	private BeanContainer<String, Todo> todos;
+	private BeanContainer<Long, Todo> todos;
 	private Table todoList;
 
 	@Override
@@ -105,20 +110,57 @@ public class VaadintodoUI extends UI {
 			todoList.setVisible(false);
 		}
 		todoList.setPageLength(0);
+		
+		todoList.addGeneratedColumn("edit", new Table.ColumnGenerator() {
+			
+			@Override
+			public Object generateCell(Table source, Object itemId, Object columnId) {
+				final Button button = new Button("Edit", event -> {
+					BeanContainer<String, Todo> tableContainer = (BeanContainer<String, Todo>)source.getContainerDataSource();
+					final TodoModal editTodoModal = new TodoModal("Edit todo", tableContainer.getItem(itemId).getBean());
+					UI.getCurrent().addWindow(editTodoModal);
+					editTodoModal.addCloseListener(new Window.CloseListener() {
+						
+						@Override
+						public void windowClose(CloseEvent event) {
+							addTodoToList(((TodoModal)event.getComponent()).getModifiedTodo());
+						}
+					});
+				});
+				return button;
+			}
+		});
+		todoList.addGeneratedColumn("Delete", new Table.ColumnGenerator() {
+			
+			@Override
+			public Object generateCell(Table source, Object itemId, Object columnId) {
+				final Button button = new Button("Delete", event -> {
+					BeanContainer<String, Todo> tableContainer = (BeanContainer<String, Todo>)source.getContainerDataSource();
+					Todo toDeleteBean = tableContainer.getItem(itemId).getBean();
+					tableContainer.removeItem(itemId);
+					toDeleteBean = null;
+				});
+				return button;
+			}
+		});
 		return todoList;
 	}
 	
-	private BeanContainer<String, Todo> getTodoContainer() {
+	private BeanContainer<Long, Todo> getTodoContainer() {
 		if(todos != null) {
 			return todos;
 		}
-		todos = new BeanContainer<String, Todo>(Todo.class);
-		todos.setBeanIdProperty("name");
+		todos = new BeanContainer<Long, Todo>(Todo.class);
+		todos.setBeanIdProperty("id");
 		return todos;
 	}
 	
 	private void addTodoToList(Todo row) {
-		getTodoContainer().addBean(row);
+		if(getTodoContainer().containsId(row.getId())) {
+			todoList.refreshRowCache();
+		} else {
+			getTodoContainer().addBean(row);
+		}
 		if(!todoList.isVisible()) {
 			todoList.setVisible(true);
 		}

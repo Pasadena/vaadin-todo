@@ -21,6 +21,8 @@ public class TodoModal extends Window {
 	
 	private final Todo todo;
 	private FieldGroup todoFieldGroup;
+	
+	private static long id = 0L;
 
 	public TodoModal(final String title, final Todo todo) {
 		super(title);
@@ -45,7 +47,10 @@ public class TodoModal extends Window {
 		
 		final TextField nameField = new TextField("Name:");
 		nameField.setRequired(true);
+		nameField.setRequiredError("Value is mandatory");
 		nameField.setNullRepresentation("");
+		//nameField.addValidator(new NullValidator("Value is mandatory", false));
+		nameField.setValidationVisible(true);
 		formLayout.addComponent(nameField);
 		
 		final TextArea summaryField = new TextArea("Summary:");
@@ -74,6 +79,9 @@ public class TodoModal extends Window {
 	public void save() {
 		try {
 			todoFieldGroup.commit();
+			if(todo.getId() == null) {
+				todo.setId(++id);
+			}
 			close();
 		} catch (FieldGroup.CommitException ce) {
 			Notification.show("Unexpected error happened during save", Notification.Type.ERROR_MESSAGE);
