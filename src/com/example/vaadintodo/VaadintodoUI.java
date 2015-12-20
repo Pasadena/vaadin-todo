@@ -1,7 +1,5 @@
 package com.example.vaadintodo;
 
-import java.util.Optional;
-
 import javax.servlet.annotation.WebServlet;
 
 import com.example.vaadintodo.components.TodoModal;
@@ -9,10 +7,8 @@ import com.example.vaadintodo.models.Todo;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.BeanItem;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.server.ExternalResource;
+import com.vaadin.server.Sizeable;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Alignment;
@@ -49,19 +45,21 @@ public class VaadintodoUI extends UI {
 		
 		final Component header = getHeader();
 		layout.addComponent(header);
-		layout.setExpandRatio(header, 0.5f);
+		layout.setExpandRatio(header, 1);
 		
 		final Component content = getMainContent();
 		layout.addComponent(content);
-		layout.setExpandRatio(content, 1.5f);
+		layout.setExpandRatio(content, 1);
 		
 		final Component footer = getFooter();
 		layout.addComponent(footer);
-		layout.setExpandRatio(footer, 0.5f);
+		layout.setExpandRatio(footer, 1);
+		layout.setComponentAlignment(header, Alignment.TOP_CENTER);
+		layout.setComponentAlignment(footer, Alignment.TOP_CENTER);
 	}
 	
-	private HorizontalLayout getHeader() {
-		final HorizontalLayout header = new HorizontalLayout();
+	private VerticalLayout getHeader() {
+		final VerticalLayout header = new VerticalLayout();
 		header.setSizeFull();
 		header.setId("header");
 		
@@ -74,21 +72,9 @@ public class VaadintodoUI extends UI {
 	
 	protected VerticalLayout getMainContent() {
 		final VerticalLayout content = new VerticalLayout();
+		content.setMargin(true);
 		Button button = new Button("Create new item");
-		button.addClickListener(new Button.ClickListener() {
-			
-			public void buttonClick(ClickEvent event) {
-				final TodoModal createTodoModal = new TodoModal("Create a new Todo", new Todo());
-				UI.getCurrent().addWindow(createTodoModal);
-				createTodoModal.addCloseListener(new Window.CloseListener() {
-					
-					@Override
-					public void windowClose(CloseEvent event) {
-						addTodoToList(((TodoModal)event.getComponent()).getModifiedTodo());
-					}
-				});
-			}
-		});
+		button.addClickListener(new ModalOpenListener("Create a todo", new Todo()));
 		content.addComponent(button);
 		content.addComponent(getTodoList());
 		return content;
@@ -114,31 +100,26 @@ public class VaadintodoUI extends UI {
 		todoList.addGeneratedColumn("edit", new Table.ColumnGenerator() {
 			
 			@Override
+			@SuppressWarnings(value = "unchecked")
 			public Object generateCell(Table source, Object itemId, Object columnId) {
-				final Button button = new Button("Edit", event -> {
-					BeanContainer<String, Todo> tableContainer = (BeanContainer<String, Todo>)source.getContainerDataSource();
-					final TodoModal editTodoModal = new TodoModal("Edit todo", tableContainer.getItem(itemId).getBean());
-					UI.getCurrent().addWindow(editTodoModal);
-					editTodoModal.addCloseListener(new Window.CloseListener() {
-						
-						@Override
-						public void windowClose(CloseEvent event) {
-							addTodoToList(((TodoModal)event.getComponent()).getModifiedTodo());
-						}
-					});
-				});
+				final Button button = new Button("Edit");
+				BeanContainer<String, Todo> tableContainer = (BeanContainer<String, Todo>)source.getContainerDataSource();
+				button.addClickListener(new ModalOpenListener("Edit todo", tableContainer.getItem(itemId).getBean()));
 				return button;
 			}
 		});
 		todoList.addGeneratedColumn("Delete", new Table.ColumnGenerator() {
 			
 			@Override
+			@SuppressWarnings(value = "unchecked")
 			public Object generateCell(Table source, Object itemId, Object columnId) {
 				final Button button = new Button("Delete", event -> {
 					BeanContainer<String, Todo> tableContainer = (BeanContainer<String, Todo>)source.getContainerDataSource();
-					Todo toDeleteBean = tableContainer.getItem(itemId).getBean();
+					Todo todo = tableContainer.getItem(itemId).getBean();
 					tableContainer.removeItem(itemId);
-					toDeleteBean = null;
+					todo = null;
+					source.setVisible((!tableContainer.getItemIds().isEmpty()));
+					todoList.refreshRowCache();
 				});
 				return button;
 			}
@@ -164,6 +145,30 @@ public class VaadintodoUI extends UI {
 		if(!todoList.isVisible()) {
 			todoList.setVisible(true);
 		}
+	}
+	
+	private class ModalOpenListener implements Button.ClickListener {
+		
+		private String title;
+		private Todo modalEntity;
+		
+		public ModalOpenListener(String title, Todo modalEntity) {
+			this.title = title;
+			this.modalEntity = modalEntity;
+		}
+
+		@Override
+		public void buttonClick(ClickEvent event) {
+			final TodoModal todoModal = new TodoModal(title, modalEntity);
+			UI.getCurrent().addWindow(todoModal);
+			todoModal.addCloseListener(new Window.CloseListener() {
+				@Override
+				public void windowClose(CloseEvent event) {
+					addTodoToList(modalEntity);
+				}
+			});
+		}
+		
 	}
 	
 	

@@ -3,6 +3,7 @@ package com.example.vaadintodo.models;
 import java.io.Serializable;
 import java.util.Date;
 
+@SuppressWarnings("serial")
 public class Todo implements Serializable {
 	
 	private Long id;

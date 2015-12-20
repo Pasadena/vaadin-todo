@@ -83,6 +83,7 @@ public class TodoModal extends Window {
 				todo.setId(++id);
 			}
 			close();
+			todoFieldGroup.discard();
 		} catch (FieldGroup.CommitException ce) {
 			Notification.show("Unexpected error happened during save", Notification.Type.ERROR_MESSAGE);
 			System.out.println(ce.getCause().getMessage());
