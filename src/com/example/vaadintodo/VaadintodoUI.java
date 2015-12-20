@@ -49,7 +49,7 @@ public class VaadintodoUI extends UI {
 		
 		final Component content = getMainContent();
 		layout.addComponent(content);
-		layout.setExpandRatio(content, 1);
+		layout.setExpandRatio(content, 2);
 		
 		final Component footer = getFooter();
 		layout.addComponent(footer);
@@ -97,7 +97,12 @@ public class VaadintodoUI extends UI {
 		}
 		todoList.setPageLength(0);
 		
-		todoList.addGeneratedColumn("edit", new Table.ColumnGenerator() {
+		todoList.setColumnHeader("name", "Name");
+		todoList.setColumnHeader("summary", "Summary");
+		todoList.setColumnHeader("dueDate", "Due Date");
+		todoList.setVisibleColumns("name", "summary", "dueDate");
+		
+		todoList.addGeneratedColumn("Edit", new Table.ColumnGenerator() {
 			
 			@Override
 			@SuppressWarnings(value = "unchecked")
