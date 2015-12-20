@@ -8,7 +8,6 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.server.ExternalResource;
-import com.vaadin.server.Sizeable;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.Alignment;
@@ -74,10 +73,27 @@ public class VaadintodoUI extends UI {
 		final VerticalLayout content = new VerticalLayout();
 		content.setMargin(true);
 		Button button = new Button("Create new item");
-		button.addClickListener(new ModalOpenListener("Create a todo", new Todo()));
+		button.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(ClickEvent event) {
+				openModal("Create a todo", new Todo());
+				
+			}
+		});
 		content.addComponent(button);
 		content.addComponent(getTodoList());
 		return content;
+	}
+	
+	private void openModal(final String title, final Todo modalEntity) {
+		final TodoModal todoModal = new TodoModal(title, modalEntity);
+		UI.getCurrent().addWindow(todoModal);
+		todoModal.addCloseListener(new Window.CloseListener() {
+			@Override
+			public void windowClose(CloseEvent event) {
+				addTodoToList(modalEntity);
+			}
+		});
 	}
 	
 	private HorizontalLayout getFooter() {
@@ -92,6 +108,7 @@ public class VaadintodoUI extends UI {
 	
 	private Table getTodoList() {
 		this.todoList = new Table("The todos", this.getTodoContainer());
+		this.todoList.setWidth(60, Unit.PERCENTAGE);
 		if(todoList.getItemIds().isEmpty()) {
 			todoList.setVisible(false);
 		}
@@ -109,7 +126,13 @@ public class VaadintodoUI extends UI {
 			public Object generateCell(Table source, Object itemId, Object columnId) {
 				final Button button = new Button("Edit");
 				BeanContainer<String, Todo> tableContainer = (BeanContainer<String, Todo>)source.getContainerDataSource();
-				button.addClickListener(new ModalOpenListener("Edit todo", tableContainer.getItem(itemId).getBean()));
+				button.addClickListener(new Button.ClickListener() {
+					@Override
+					public void buttonClick(ClickEvent event) {
+						openModal("Edit todo", tableContainer.getItem(itemId).getBean());
+						
+					}
+				});
 				return button;
 			}
 		});
@@ -151,30 +174,5 @@ public class VaadintodoUI extends UI {
 			todoList.setVisible(true);
 		}
 	}
-	
-	private class ModalOpenListener implements Button.ClickListener {
-		
-		private String title;
-		private Todo modalEntity;
-		
-		public ModalOpenListener(String title, Todo modalEntity) {
-			this.title = title;
-			this.modalEntity = modalEntity;
-		}
-
-		@Override
-		public void buttonClick(ClickEvent event) {
-			final TodoModal todoModal = new TodoModal(title, modalEntity);
-			UI.getCurrent().addWindow(todoModal);
-			todoModal.addCloseListener(new Window.CloseListener() {
-				@Override
-				public void windowClose(CloseEvent event) {
-					addTodoToList(modalEntity);
-				}
-			});
-		}
-		
-	}
-	
 	
 }
