@@ -1,9 +1,14 @@
 package com.example.vaadintodo.components;
 
+import java.util.EnumSet;
+
+import com.example.vaadintodo.constants.TodoPriorities;
+import com.example.vaadintodo.converters.TodoPriorityConverter;
 import com.example.vaadintodo.models.Todo;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -61,6 +66,11 @@ public class TodoModal extends Window {
 		dueDateField.setDateFormat("dd.MM.yyyy");
 		formLayout.addComponent(dueDateField);
 		
+		final ComboBox priorityList = new ComboBox("Priority:");
+		priorityList.addItems(EnumSet.allOf(TodoPriorities.class));
+		priorityList.setConverter(new TodoPriorityConverter());
+		formLayout.addComponent(priorityList);
+		
 		final HorizontalLayout buttonRow = new HorizontalLayout();
 		formLayout.addComponent(buttonRow);
 		
@@ -72,6 +82,7 @@ public class TodoModal extends Window {
 		todoFieldGroup.bind(nameField, "name");
 		todoFieldGroup.bind(summaryField, "summary");
 		todoFieldGroup.bind(dueDateField, "dueDate");
+		todoFieldGroup.bind(priorityList, "priority");
 		
 		return formLayout;
 	}
@@ -94,5 +105,4 @@ public class TodoModal extends Window {
 	public Todo getModifiedTodo() {
 		return ((BeanItem<Todo>)todoFieldGroup.getItemDataSource()).getBean();
 	}
-	
 }

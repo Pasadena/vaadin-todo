@@ -117,7 +117,8 @@ public class VaadintodoUI extends UI {
 		todoList.setColumnHeader("name", "Name");
 		todoList.setColumnHeader("summary", "Summary");
 		todoList.setColumnHeader("dueDate", "Due Date");
-		todoList.setVisibleColumns("name", "summary", "dueDate");
+		todoList.setColumnHeader("priority", "Priority");
+		todoList.setVisibleColumns("name", "summary", "priority", "dueDate");
 		
 		todoList.addGeneratedColumn("Edit", new Table.ColumnGenerator() {
 			

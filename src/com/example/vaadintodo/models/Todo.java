@@ -14,6 +14,8 @@ public class Todo implements Serializable {
 	
 	private Date dueDate;
 	
+	private Integer priority;
+	
 
 	public Long getId() {
 		return id;
@@ -47,6 +49,14 @@ public class Todo implements Serializable {
 		this.dueDate = dueDate;
 	}
 	
+	public Integer getPriority() {
+		return priority;
+	}
+
+	public void setPriority(Integer priority) {
+		this.priority = priority;
+	}
+
 	@Override
 	public String toString() {
 		return new StringBuilder()
