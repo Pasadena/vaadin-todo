@@ -42,7 +42,7 @@ public class TodoModal extends Window {
 		center();
 		setModal(true);
 		setClosable(false);
-		setHeight("50%");
+		setHeight("80%");
 		setWidth("50%");
 	}
 	

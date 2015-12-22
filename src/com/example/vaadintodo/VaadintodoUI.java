@@ -3,6 +3,7 @@ package com.example.vaadintodo;
 import javax.servlet.annotation.WebServlet;
 
 import com.example.vaadintodo.components.TodoModal;
+import com.example.vaadintodo.converters.TodoPriorityConverter;
 import com.example.vaadintodo.models.Todo;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -38,8 +39,8 @@ public class VaadintodoUI extends UI {
 	@Override
 	protected void init(VaadinRequest request) {
 		final VerticalLayout layout = new VerticalLayout();
-		layout.setMargin(true);
-		layout.setSizeFull();
+		layout.setWidth(80, Unit.PERCENTAGE);
+		layout.addStyleName("main-content");
 		setContent(layout);
 		
 		final Component header = getHeader();
@@ -63,6 +64,7 @@ public class VaadintodoUI extends UI {
 		header.setId("header");
 		
 		final Label headerText = new Label("TODOS: Get your stuff together");
+		headerText.addStyleName("page-header");
 		header.setWidth(null);
 		header.addComponent(headerText);
 		header.setComponentAlignment(headerText, Alignment.MIDDLE_CENTER);
@@ -73,6 +75,7 @@ public class VaadintodoUI extends UI {
 		final VerticalLayout content = new VerticalLayout();
 		content.setMargin(true);
 		Button button = new Button("Create new item");
+		button.addStyleName("primary");
 		button.addClickListener(new Button.ClickListener() {
 			@Override
 			public void buttonClick(ClickEvent event) {
@@ -101,6 +104,7 @@ public class VaadintodoUI extends UI {
 		final Link viewSourcesLink = new Link("View sources in Github", new ExternalResource("https://github.com/Pasadena/vaadin-todo"));
 		viewSourcesLink.setTargetName("_blank");
 		viewSourcesLink.setWidth(null);
+		viewSourcesLink.addStyleName("page-footer");
 		footer.addComponent(viewSourcesLink);
 		footer.setComponentAlignment(viewSourcesLink, Alignment.MIDDLE_CENTER);
 		return footer;
@@ -108,7 +112,7 @@ public class VaadintodoUI extends UI {
 	
 	private Table getTodoList() {
 		this.todoList = new Table("The todos", this.getTodoContainer());
-		this.todoList.setWidth(60, Unit.PERCENTAGE);
+		this.todoList.setWidth(80, Unit.PERCENTAGE);
 		if(todoList.getItemIds().isEmpty()) {
 			todoList.setVisible(false);
 		}
@@ -120,12 +124,14 @@ public class VaadintodoUI extends UI {
 		todoList.setColumnHeader("priority", "Priority");
 		todoList.setVisibleColumns("name", "summary", "priority", "dueDate");
 		
+		todoList.setStyleName("todo-table");
 		todoList.addGeneratedColumn("Edit", new Table.ColumnGenerator() {
 			
 			@Override
 			@SuppressWarnings(value = "unchecked")
 			public Object generateCell(Table source, Object itemId, Object columnId) {
 				final Button button = new Button("Edit");
+				button.addStyleName("primary");
 				BeanContainer<String, Todo> tableContainer = (BeanContainer<String, Todo>)source.getContainerDataSource();
 				button.addClickListener(new Button.ClickListener() {
 					@Override
@@ -150,6 +156,7 @@ public class VaadintodoUI extends UI {
 					source.setVisible((!tableContainer.getItemIds().isEmpty()));
 					todoList.refreshRowCache();
 				});
+				button.addStyleName("danger");
 				return button;
 			}
 		});
