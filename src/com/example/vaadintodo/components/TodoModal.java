@@ -5,6 +5,8 @@ import java.util.EnumSet;
 import com.example.vaadintodo.constants.TodoPriorities;
 import com.example.vaadintodo.converters.TodoPriorityConverter;
 import com.example.vaadintodo.models.Todo;
+import com.example.vaadintodo.services.TodoService;
+import com.example.vaadintodo.services.TodoServiceImpl;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.Button;
@@ -26,12 +28,13 @@ public class TodoModal extends Window {
 	
 	private final Todo todo;
 	private FieldGroup todoFieldGroup;
+	private final TodoService todoService;
 	
-	private static long id = 0L;
 
 	public TodoModal(final String title, final Todo todo) {
 		super(title);
 		this.todo = todo;
+		this.todoService = new TodoServiceImpl();
 		BeanItem<Todo> todoItem = new BeanItem<Todo>(this.todo);
 		this.todoFieldGroup = new FieldGroup(todoItem);
 		this.setWindowProperties();
@@ -90,14 +93,20 @@ public class TodoModal extends Window {
 	public void save() {
 		try {
 			todoFieldGroup.commit();
-			if(todo.getId() == null) {
-				todo.setId(++id);
-			}
+			this.saveOrUpdateTodo();
 			close();
 			todoFieldGroup.discard();
 		} catch (FieldGroup.CommitException ce) {
 			Notification.show("Unexpected error happened during save", Notification.Type.ERROR_MESSAGE);
 			System.out.println(ce.getCause().getMessage());
+		}
+	}
+	
+	private void saveOrUpdateTodo() {
+		if(todo.getId() == null) {
+			todoService.saveTodo(todo);
+		} else {
+			todoService.updateTodo(todo);
 		}
 	}
 	
