@@ -1,19 +1,30 @@
 package com.example.vaadintodo.components;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.example.vaadintodo.constants.TodoPriorities;
 import com.example.vaadintodo.converters.TodoPriorityConverter;
 import com.example.vaadintodo.models.Todo;
 import com.example.vaadintodo.services.TodoService;
 import com.example.vaadintodo.services.TodoServiceImpl;
+import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.data.validator.NullValidator;
+import com.vaadin.server.ErrorMessage;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
@@ -27,8 +38,10 @@ public class TodoModal extends Window {
 	private static final long serialVersionUID = -1861736808815075977L;
 	
 	private final Todo todo;
-	private FieldGroup todoFieldGroup;
+	private BeanFieldGroup<Todo> todoFieldGroup;
 	private final TodoService todoService;
+	
+	private Label errorField;
 	
 
 	public TodoModal(final String title, final Todo todo) {
@@ -36,7 +49,8 @@ public class TodoModal extends Window {
 		this.todo = todo;
 		this.todoService = new TodoServiceImpl();
 		BeanItem<Todo> todoItem = new BeanItem<Todo>(this.todo);
-		this.todoFieldGroup = new FieldGroup(todoItem);
+		this.todoFieldGroup = new BeanFieldGroup<Todo>(Todo.class);
+		this.todoFieldGroup.setItemDataSource(todo);
 		this.setWindowProperties();
 		setContent(createForm());
 	}
@@ -53,12 +67,14 @@ public class TodoModal extends Window {
 		final FormLayout formLayout = new FormLayout();
 		formLayout.setMargin(true);
 		
+		this.errorField = new Label("Errors occurred!", ContentMode.HTML);
+		errorField.setVisible(false);
+		formLayout.addComponent(errorField);
+		
 		final TextField nameField = new TextField("Name:");
-		nameField.setRequired(true);
-		nameField.setRequiredError("Value is mandatory");
 		nameField.setNullRepresentation("");
-		//nameField.addValidator(new NullValidator("Value is mandatory", false));
-		nameField.setValidationVisible(true);
+		nameField.addValidator(new NullValidator("Value is mandatory", false));
+		nameField.setValidationVisible(false);
 		formLayout.addComponent(nameField);
 		
 		final TextArea summaryField = new TextArea("Summary:");
@@ -97,9 +113,34 @@ public class TodoModal extends Window {
 			close();
 			todoFieldGroup.discard();
 		} catch (FieldGroup.CommitException ce) {
-			Notification.show("Unexpected error happened during save", Notification.Type.ERROR_MESSAGE);
+			this.enableValidation();
+			String validationErrors = getJoinedErrorMessage();
+			if(!validationErrors.isEmpty()) {
+				errorField.setVisible(true);
+				errorField.setValue(validationErrors);
+			} else {
+				Notification.show("Unexpected error happened during save", Notification.Type.ERROR_MESSAGE);
+			}
 			System.out.println(ce.getCause().getMessage());
+			
 		}
+	}
+	
+	private void enableValidation() {
+		for(Field<?> field: todoFieldGroup.getFields()) {
+			((AbstractField<?>)field).setValidationVisible(true);
+		}
+	}
+	
+	private String getJoinedErrorMessage() {
+		List<String> errorMessages = new ArrayList<String>();
+		for(Field<?> field: todoFieldGroup.getFields()) {
+			ErrorMessage errorMessage = ((AbstractField<?>)field).getErrorMessage();
+			if(errorMessage != null) {
+				errorMessages.add(String.format("Error in field %s %s", field.getCaption(), errorMessage.toString()));
+			}
+		}
+		return String.join("\n", errorMessages);
 	}
 	
 	private void saveOrUpdateTodo() {
@@ -110,8 +151,9 @@ public class TodoModal extends Window {
 		}
 	}
 	
+	/**
 	@SuppressWarnings(value = "unchecked")
 	public Todo getModifiedTodo() {
 		return ((BeanItem<Todo>)todoFieldGroup.getItemDataSource()).getBean();
-	}
+	}**/
 }

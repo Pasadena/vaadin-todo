@@ -16,6 +16,7 @@ public class TodoPriorityIdToNameConverter implements Converter<String, Integer>
 	@Override
 	public String convertToPresentation(Integer value, Class<? extends String> targetType, Locale locale)
 			throws com.vaadin.data.util.converter.Converter.ConversionException {
+		if(value == null) return "";
 		return TodoPriorities.getById(value).getName();
 	}
 
