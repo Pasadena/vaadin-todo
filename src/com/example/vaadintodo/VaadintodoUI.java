@@ -1,13 +1,19 @@
 package com.example.vaadintodo;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import javax.servlet.annotation.WebServlet;
 
 import com.example.vaadintodo.components.TodoModal;
-import com.example.vaadintodo.converters.TodoPriorityConverter;
+import com.example.vaadintodo.converters.TodoPriorityIdToNameConverter;
 import com.example.vaadintodo.models.Todo;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.converter.StringToDateConverter;
+import com.vaadin.data.util.converter.StringToIntegerConverter;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
@@ -125,6 +131,15 @@ public class VaadintodoUI extends UI {
 		todoList.setVisibleColumns("name", "summary", "priority", "dueDate");
 		
 		todoList.setStyleName("todo-table");
+		
+		todoList.setConverter("priority", new TodoPriorityIdToNameConverter());
+		todoList.setConverter("dueDate", new StringToDateConverter() {
+			@Override
+			public DateFormat getFormat(Locale locale){
+				return new SimpleDateFormat("dd.MM.yyyy");
+			}
+			
+		});
 		todoList.addGeneratedColumn("Edit", new Table.ColumnGenerator() {
 			
 			@Override
