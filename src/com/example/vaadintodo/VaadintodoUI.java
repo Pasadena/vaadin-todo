@@ -128,7 +128,8 @@ public class VaadintodoUI extends UI {
 		todoList.setColumnHeader("summary", "Summary");
 		todoList.setColumnHeader("dueDate", "Due Date");
 		todoList.setColumnHeader("priority", "Priority");
-		todoList.setVisibleColumns("name", "summary", "priority", "dueDate");
+		todoList.setColumnHeader("status", "Status");
+		todoList.setVisibleColumns("status", "name", "summary", "priority", "dueDate");
 		
 		todoList.setStyleName("todo-table");
 		
@@ -172,6 +173,22 @@ public class VaadintodoUI extends UI {
 					todoList.refreshRowCache();
 				});
 				button.addStyleName("danger");
+				return button;
+			}
+		});
+		
+		todoList.addGeneratedColumn("Mark completed", new Table.ColumnGenerator() {
+			
+			@Override
+			@SuppressWarnings(value = "unchecked")
+			public Object generateCell(Table source, Object itemId, Object columnId) {
+				final Button button = new Button("Complete", event -> {
+					BeanContainer<String, Todo> tableContainer = (BeanContainer<String, Todo>)source.getContainerDataSource();
+					Todo todo = tableContainer.getItem(itemId).getBean();
+					todo.setStatus(Todo.TodoStatuses.COMPLETED.getName());
+					todoList.refreshRowCache();
+				});
+				button.addStyleName("primary");
 				return button;
 			}
 		});

@@ -145,15 +145,10 @@ public class TodoModal extends Window {
 	
 	private void saveOrUpdateTodo() {
 		if(todo.getId() == null) {
+			todo.setStatus(Todo.TodoStatuses.WIP.getName());
 			todoService.saveTodo(todo);
 		} else {
 			todoService.updateTodo(todo);
 		}
 	}
-	
-	/**
-	@SuppressWarnings(value = "unchecked")
-	public Todo getModifiedTodo() {
-		return ((BeanItem<Todo>)todoFieldGroup.getItemDataSource()).getBean();
-	}**/
 }

@@ -6,6 +6,20 @@ import java.util.Date;
 @SuppressWarnings("serial")
 public class Todo implements Serializable {
 	
+	public enum TodoStatuses {
+		WIP("Work in progress"),
+		COMPLETED("Completed");
+		
+		private String name;
+		private TodoStatuses(String name) {
+			this.name = name;
+		}
+		
+		public String getName() {
+			return name;
+		}
+	}
+	
 	private Long id;
 	
 	private String name;
@@ -15,6 +29,8 @@ public class Todo implements Serializable {
 	private Date dueDate;
 	
 	private Integer priority;
+	
+	private String status;
 	
 
 	public Long getId() {
@@ -57,6 +73,14 @@ public class Todo implements Serializable {
 		this.priority = priority;
 	}
 
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	@Override
 	public String toString() {
 		return new StringBuilder()
@@ -64,6 +88,7 @@ public class Todo implements Serializable {
 				.append("Name: " + this.getName() + ",")
 				.append("Summary: " + this.getSummary() + ",")
 				.append("Due Date: " +dueDate.toString())
+				.append("Status: " +this.getStatus())
 				.append("}")
 				.toString();
 	}
